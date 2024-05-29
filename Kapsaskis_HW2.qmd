@@ -1,0 +1,323 @@
+---
+title: "ST558 Homework 2 - Programming in Base R"
+author: "Kyra Kapsaskis"
+format: html
+editor: visual
+---
+
+## Task 1: Basic Vector Practice
+
+Suppose we have data from a medical experiment on blood pressure. We have the following pre-treatment values for subjects 1 through 20:
+
+• 130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 140, 137, 131, 120, 128, 139, 135
+
+after treatment, the subjects were measured again (subjects 1 through 20 match)
+
+• 114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 106, 106, 124, 102, 117, 113
+
+1.  Create two vectors. One vector corresponding to the pre measurements and one to the post measurements.
+
+```{r}
+#using the c() function to create a vector
+pre_m <- c(130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 140, 137, 131, 120, 128, 139, 135)
+post_m <- c(114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 106, 106, 124, 102, 117, 113)
+```
+
+2.  Assign names to the vector elements using the paste() function. Note that names() can be overwritten by a character vector. To quickly create the names, try running the code
+
+```{r}
+paste("Subject", 1:20, sep = "_")
+
+# that looks like it created a vector containing the names that I want, so I am going to rename it 'subject_names'}
+
+subject_names <- paste("Subject", 1:20, sep = "_")
+
+# now trying to assign the subject names to the values
+
+names(pre_m) <- subject_names
+names(pre_m)
+pre_m
+
+names(post_m)
+names(post_m) <- subject_names
+names(post_m)
+post_m
+```
+
+Create the same names for each vector’s elements.
+
+3.  Calculate the change in blood pressure for each patient by subtracting post-treatment measurements from pre-treatment measurements. Recall that R does math elementwise! Save this calculation as a new object in R (also a vector)
+
+```{r}
+bp_range <- pre_m - post_m
+bp_range
+
+```
+
+4.  Calculate the average decrease in blood pressure across all patients.
+
+```{r}
+# using the mean() function to calculate the average decrease
+mean(bp_range)
+
+```
+
+5.  Determine which patients experienced a decrease in blood pressure after treatment (a positive change). Use the which() function to just return the indices (and names) associated with this type of change.
+
+```{r}
+decreased_bp <- which(bp_range<0)
+decreased_bp
+```
+
+6.  Subset the vector of differences to only return those that have a positive change.
+
+```{r}
+pos_change <- bp_range[-decreased_bp]
+pos_change
+```
+
+7.  Calculate the average decrease in blood pressure for those where the blood pressure decreased (positive change).
+
+```{r}
+mean(pos_change)
+```
+
+## Task 2: Basic Data Frame practice
+
+Continue the previous example.
+
+1.  Create a data frame object with four columns corresponding to your data above: `patient`, `pre_bp`, `post_bp`, and `diff_bp`
+
+```{r}
+# using the data.frame() function to make a data frame
+
+my_df <- data.frame(patient = subject_names, pre_bp = pre_m, post_bp = post_m, diff_pb = bp_range)
+my_df
+```
+
+2.  Return only rows where the `diff_bp` column is negative. (Use `[` or learn about the `subset()` function if you’d like. If you use `[`, don’t reference the original vector from the first part, access the column of the data frame when looking at making a comparison.)
+
+```{r}
+my_df[my_df$diff_pb<0,]
+```
+
+3.  Add a new column to the data frame corresponding to `TRUE` if the `post_bp` is less than 120. Recall you can use `$` to access a column. If you reference a column that doesn’t exist, and save a vector (of appropriate length in it), that vector becomes a column of your data frame! Similar to the previous question, don’t reference the original vector from the first part, access the column of the data frame when looking at making a comparison.
+
+```{r}
+my_df$low_post_bp=ifelse(my_df$post_bp<120,TRUE,FALSE)
+my_df
+```
+
+4.  Finally, print the data frame out nicely in your final document by modifying the code below appropriately.
+
+```{r}
+knitr::kable(my_df)
+```
+
+## Task 3: List practice
+
+Continue the previous example. Suppose we now also have data from another experiment where the ‘treatment’ was actually a placebo.
+
+We have the following pre-treatment values for subjects 1 through 10 (different set of subjects):
+
+• 138, 135, 147, 117, 152, 134, 114, 121, 131, 130
+
+after treatment, the subjects were measured again (subjects 1 through 10 match)
+
+• 105, 136, 123, 130, 134, 143, 135, 139, 120, 124
+
+1.  Create a new data frame with this data in it that is similar to the data frame from task 2 (including the new column).
+
+```{r}
+placebo_pre_m <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+placebo_post_m <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+```
+
+```{r}
+placebo_subject_names <- paste("Subject", 1:10, sep = "_")
+
+# now trying to assign the subject names to the values
+
+names(placebo_pre_m) <- placebo_subject_names
+names(placebo_pre_m)
+placebo_pre_m
+
+names(placebo_post_m) <- placebo_subject_names
+names(placebo_post_m)
+placebo_post_m
+```
+
+```{r}
+placebo_bp_range <- placebo_pre_m - placebo_post_m
+placebo_bp_range
+```
+
+```{r}
+my_placebo_df <- data.frame(patient = placebo_subject_names, pre_bp = placebo_pre_m, post_bp = placebo_post_m, diff_pb = placebo_bp_range)
+my_placebo_df
+```
+
+```{r}
+my_placebo_df$low_post_bp=ifelse(my_placebo_df$post_bp<120,TRUE,FALSE)
+my_placebo_df
+```
+
+2.  Now create and store a list with two elements:
+
+• 1st element named `treatment` and contains the first data frame you created.
+
+• 2nd element named `placebo` and contains the second data frame you created.
+
+```{r}
+my_list <- list(treatment=my_df, placebo=my_placebo_df)
+
+```
+
+3.  Access the first list element using three different types of syntax.
+
+```{r}
+my_list[[1]]
+```
+
+```{r}
+my_list$treatment
+```
+
+```{r}
+my_list[1][1]
+```
+
+4.  In one line, access the `placebo` data frame, `pre_bp` column.
+
+```{r}
+my_list$placebo$pre_bp
+```
+
+## Task 4: Control Flow Practice
+
+Continue the previous example.
+
+1.  Suppose we want to characterize the post-treatment (or placebo) blood pressure measurement as optimal (≤ 120), borderline (120 \< bp ≤ 130), and high (\> 130). First, create a new column in each data frame from above called status. You can do this via
+
+```{r}
+# your_df$status <- character(20) #or 10 depending on number of observations
+```
+
+Note: You want to do this additional column to the data frames that are stored in your list (R doesn’t do referencing to the original object).
+
+```{r}
+my_list$treatment$status <- character(20)
+my_list$placebo$status <- character(10)
+```
+
+2.  For the non-placebo data frame (within the list), create a for loop and use if/then/else logic to create the status column’s values.
+
+```{r}
+
+# for loop for treatment df status
+
+for (i in 1:20) {
+  if(my_list$treatment$post_bp[i] <= 120) { 
+    my_list$treatment$status[i]="optimal"
+  } else if (my_list$treatment$post_bp[i] > 120 & my_list$treatment$post_bp[i] <= 130) {
+    my_list$treatment$status[i]="borderline"
+  } else if (my_list$treatment$post_bp[i] > 130) {
+    my_list$treatment$status[i]="high"
+  } else {
+    my_list$treatment$status[i]="Error"
+  }
+}
+
+
+
+
+
+```
+
+3.  Repeat for the placebo data frame (within the list).
+
+```{r}
+# for loop for placebo df status
+
+for (i in 1:10) {
+  if(my_list$placebo$post_bp[i] <= 120) { 
+    my_list$placebo$status[i]="optimal"
+  } else if (my_list$placebo$post_bp[i] > 120 & my_list$placebo$post_bp[i] <= 130) {
+    my_list$placebo$status[i]="borderline"
+  } else if (my_list$placebo$post_bp[i] > 130) {
+    my_list$placebo$status[i]="high"
+  } else {
+    my_list$placebo$status[i]="Error"
+  }
+}
+```
+
+## Task 5: Function Writing
+
+Continue the previous example. Suppose you would eventually have many datasets in the form of the two above. You want to write a function to do some things for you quickly.
+
+1.  Write a function that
+
+• takes in a list with two data frames in it (a `treatment` and a `placebo` data frame) as an argument. Give no default value.
+
+• takes in an R function (that would find a summary of a numeric column) with the default value being set to `"mean"` (notice this is a quoted string).
+
+• Finds the statistic of interest (as defined by the user input) for the `pre`, `post`, and `diff` columns of both data frames.
+
+– Use `my_fun <- get(stat)` within the function to get the function from the quoted string.
+
+• These six values should then be returned as a named list with meaningful names - this is a somewhat challenging part!
+
+– I’m going to let you consider what to do but you might create a vector of names that is created dynamically based on the statistic passed, create a vector with the actual statistic values, and then assign `names()` to your vector. Then return that (an atomic vector with names can be returned instead of a list).
+
+```{r}
+
+my_function <- function(list_of_df, stat="mean") {
+  
+  
+  # create the column list with all the columns you want to get summary stats from
+  column_of_interest_list <- list(list_of_df[[1]]$pre, list_of_df[[1]]$post, list_of_df[[1]]$diff, list_of_df[[2]]$pre, list_of_df[[2]]$post, list_of_df[[2]]$diff)
+  
+  # name the function for your summary stat
+  my_stat <- get(stat)
+  
+  stat_list <- lapply(column_of_interest_list,my_stat)
+  
+  # create a vector of meaningful names
+  
+  meaningful_names <- c("Pre-Treatment BP (Treatment Group)", "Post-Treatment BP (Treatment Group)", "Difference in BP (Treatment Group)", "Pre-Treatment BP (Placebo Group)", "Post-Treatment BP (Placebo Group)", "Difference in BP (Placebo Group)")
+  
+  # add stat name
+  
+  meaningful_names_w_stat=paste(meaningful_names,stat)
+  
+  # apply the meaningful names to the stat list
+  
+  names(stat_list) <- meaningful_names_w_stat
+  
+  return(stat_list)
+}
+  
+
+```
+
+• Finally, apply your function to you list of data frames from previous. Use it without specifying your statistic, with specifying your statistic as `"var"`, `"sd"`, `"min"`, and `"max"`.
+
+```{r}
+# mean
+my_function(my_list)
+
+# var
+my_function(my_list,"var")
+
+# sd
+my_function(my_list,"sd")
+
+# min
+my_function(my_list,"min")
+
+# max
+my_function(my_list,"max")
+
+
+```
